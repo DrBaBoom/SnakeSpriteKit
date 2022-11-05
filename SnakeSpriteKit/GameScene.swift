@@ -47,7 +47,37 @@ class GameScene: SKScene {
             default: break
             }
             if let direction = direction {
-                head.run(head.mMoveAction(by: direction))
+                head.removeAllActions()
+                
+                let infinityPoint = head.getPoint(by: direction)
+                head.replaceLastPoint(infinityPoint)
+                
+                
+                let headPosition = head.position
+                
+                for s in snake {
+                    if s == head {
+                        continue
+                    }
+                    s.replaceLastPoint(headPosition)
+                    s.addNewPoint(infinityPoint)
+                    
+//                    if s.hasTwoPointsToMove() && s.isMoving {
+//                        s.removeAllActions()
+//                        s.startMoving()
+//                    }
+                }
+                
+                for s in snake {
+                    if s == head {
+                        s.removeAllActions()
+                        s.startMoving()
+                    }
+                    else if s.hasTwoPointsToMove() && s.isMoving {
+                        s.removeAllActions()
+                        s.startMoving()
+                    }
+                }
             }
         }
     }
@@ -58,15 +88,26 @@ class GameScene: SKScene {
             self.head = head
         }
         let position = snake.last?.position ?? CGPoint(x: self.size.width / 2, y: self.size.height / 2)
-        let direction = snake.last?.direction ?? .up
+//        let direction = snake.last?.direction ?? .up
         newSquare.previous = snake.last
         newSquare.position = position
         snake.append(newSquare)
         self.addChild(newSquare)
-        let moveAction = newSquare.mMoveAction(by: direction)
-        newSquare.run(waitAction) {
-            newSquare.isMoving = true
-            newSquare.run(moveAction)
+        
+//        var moveAction: SKAction
+        if let head = newSquare as? HeadSquare {
+            let infinityPoint = head.getPoint(by: Direction.up)
+            head.addNewPoint(infinityPoint)
+            head.startMoving()
+        }
+        else {
+            //        let moveAction = newSquare.mMoveAction(by: direction)
+            
+            newSquare.copyPointsToMove()
+            newSquare.run(waitAction) {
+                newSquare.isMoving = true
+                newSquare.startMoving() // .run(moveAction)
+            }
         }
     }
     
@@ -98,7 +139,7 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         for s in snake {
-            s.turnIfNeeded()
+//            s.turnIfNeeded()
             s.adjustMyPosition()
         }
     }

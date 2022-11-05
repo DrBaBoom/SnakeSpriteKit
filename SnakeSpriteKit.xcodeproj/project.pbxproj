@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DE208F812911957C0088B749 /* HeadSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE208F802911957C0088B749 /* HeadSquare.swift */; };
 		DE208F852911A8C00088B749 /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE208F842911A8C00088B749 /* Consts.swift */; };
 		DE385AF8290E7B0F0012BB2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE385AF7290E7B0F0012BB2B /* AppDelegate.swift */; };
 		DE385AFE290E7B0F0012BB2B /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE385AFD290E7B0F0012BB2B /* GameScene.swift */; };
@@ -24,7 +23,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DE208F802911957C0088B749 /* HeadSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadSquare.swift; sourceTree = "<group>"; };
 		DE208F842911A8C00088B749 /* Consts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		DE385AF4290E7B0F0012BB2B /* SnakeSpriteKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnakeSpriteKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE385AF7290E7B0F0012BB2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,7 +76,6 @@
 				DE385B14290EA4640012BB2B /* Extensions.swift */,
 				DE385B12290EA0960012BB2B /* BitMasks.swift */,
 				DE385B0E290E7CB90012BB2B /* Square.swift */,
-				DE208F802911957C0088B749 /* HeadSquare.swift */,
 				DE385B10290E86F20012BB2B /* Enums.swift */,
 				DE385AFF290E7B0F0012BB2B /* GameViewController.swift */,
 				DE385B01290E7B0F0012BB2B /* Main.storyboard */,
@@ -166,7 +163,6 @@
 				DE385B0F290E7CB90012BB2B /* Square.swift in Sources */,
 				DE385AFE290E7B0F0012BB2B /* GameScene.swift in Sources */,
 				DE385B11290E86F20012BB2B /* Enums.swift in Sources */,
-				DE208F812911957C0088B749 /* HeadSquare.swift in Sources */,
 				DE385B13290EA0960012BB2B /* BitMasks.swift in Sources */,
 				DE385B00290E7B0F0012BB2B /* GameViewController.swift in Sources */,
 				DE385AF8290E7B0F0012BB2B /* AppDelegate.swift in Sources */,

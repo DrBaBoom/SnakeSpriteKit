@@ -9,12 +9,18 @@ import SpriteKit
 
 class Square: SKSpriteNode {
     
-    private(set) var direction: Direction = .up
+    //    private(set) var direction: Direction = .up
     var previous: Square? = nil
     
+    var pointOfDestination: CGPoint? {
+        pointsToMove.first
+    }
+    
+    fileprivate var pointsToMove = [CGPoint]()
+    
     var isMoving = false
-
-        
+    
+    
     init(size: CGSize) {
         super.init(texture: nil, color: .red, size: size)
         self.zPosition = 100
@@ -26,9 +32,26 @@ class Square: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func addNewPoint(_ point: CGPoint) {
+        pointsToMove.append(point)
+    }
     
-    func mMoveAction(by direction: Direction) -> SKAction {
-        self.direction = direction
+    func replaceLastPoint(_ point: CGPoint) {
+        guard pointsToMove.count > 0 else {
+            fatalError("Empty pointsToMove in replaceLastPoint")
+        }
+        pointsToMove[pointsToMove.count - 1] = point
+    }
+    
+    func myPrint() { print() }
+    
+    func hasTwoPointsToMove() -> Bool {
+        return pointsToMove.count == 2
+    }
+    
+    
+    func getPoint(by direction: Direction) -> CGPoint {
+        //        self.direction = direction
         let currentPos = self.position
         let pointToMove: CGPoint
         switch direction {
@@ -41,47 +64,99 @@ class Square: SKSpriteNode {
         case .down:
             pointToMove = CGPoint(x: currentPos.x, y: currentPos.y - Consts.veryLarge)
         }
-        let action = SKAction.move(to: pointToMove, duration: Consts.veryLarge / Consts.speed)
-        return action
+        return pointToMove
     }
     
-    
-    func turnIfNeeded() {
-        if let previous = previous, previous.direction != self.direction {
-            var changeDirection = false
-            switch previous.direction {
-            case .right, .left:
-                changeDirection = self.position.y ~ previous.position.y
-            case .down, .up:
-                changeDirection = self.position.x ~ previous.position.x
-            }
-            if changeDirection {
-                self.removeAllActions()
-                self.run(mMoveAction(by: previous.direction))
-            }
-            
+    func startMoving() {
+        guard pointsToMove.count > 0 else {
+            fatalError("Empty pointsToMove in startMoving")
+        }
+        let position = self.position
+        let distance = abs((pointsToMove[0].x - position.x) + (pointsToMove[0].y - position.y))
+        let moveAction = SKAction.move(to: pointsToMove[0], duration: distance / Consts.speed)
+        self.run(moveAction) {
+            self.pointsToMove.remove(at: 0)
+            self.startMoving()
         }
     }
     
+    func copyPointsToMove() {
+        if let previous = previous {
+            self.pointsToMove = previous.pointsToMove
+        }
+    }
+    
+    
+    //    func mMoveAction(by direction: Direction) -> SKAction {
+    //        self.direction = direction
+    //        let currentPos = self.position
+    //        let pointToMove: CGPoint
+    //        switch direction {
+    //        case .right:
+    //            pointToMove = CGPoint(x: currentPos.x + Consts.veryLarge, y: currentPos.y)
+    //        case .left:
+    //            pointToMove = CGPoint(x: currentPos.x - Consts.veryLarge, y: currentPos.y)
+    //        case .up:
+    //            pointToMove = CGPoint(x: currentPos.x, y: currentPos.y + Consts.veryLarge)
+    //        case .down:
+    //            pointToMove = CGPoint(x: currentPos.x, y: currentPos.y - Consts.veryLarge)
+    //        }
+    //        let action = SKAction.move(to: pointToMove, duration: Consts.veryLarge / Consts.speed)
+    //        return action
+    //    }
+    //
+    
+    //    func turnIfNeeded() {
+    //        if let previous = previous, previous.direction != self.direction {
+    //            var changeDirection = false
+    //            switch previous.direction {
+    //            case .right, .left:
+    //                changeDirection = self.position.y ~ previous.position.y
+    //            case .down, .up:
+    //                changeDirection = self.position.x ~ previous.position.x
+    //            }
+    //            if changeDirection {
+    //                self.removeAllActions()
+    //                self.run(mMoveAction(by: previous.direction))
+    //            }
+    //
+    //        }
+    //    }
+    
     func adjustMyPosition() {
         
-        if let previous = previous, isMoving, direction == previous.direction {
+        if let previous = previous, isMoving, pointOfDestination == previous.pointOfDestination {
             
-            var needsAdjusting = false
-            switch direction {
-            case .right, .left:
-                needsAdjusting = self.position.y ~ previous.position.y
-            case .up, .down:
-                needsAdjusting = self.position.x ~ previous.position.x
-            }
-            if !needsAdjusting {
-                return
+            //            var needsAdjusting = false
+            //            switch direction {
+            //            case .right, .left:
+            //                needsAdjusting = self.position.y ~ previous.position.y
+            //            case .up, .down:
+            //                needsAdjusting = self.position.x ~ previous.position.x
+            //            }
+            //            if !needsAdjusting {
+            //                return
+            //            }
+            
+            let position = self.position
+            let destination = self.pointOfDestination!
+            
+            var direction = Direction.up
+            let err: CGFloat = 2
+            if destination.x - position.x > err {
+                direction = .right
+            } else if destination.x - position.x < -err {
+                direction = .left
+            } else if destination.y - position.y > err {
+                direction = .up
+            } else if destination.y - position.y < -err {
+                direction = .down
             }
             
-            let w = self.size.width
+            let w = self.size.width + 1
             var x = previous.position.x
             var y = previous.position.y
-
+            
             switch direction {
             case .right:
                 x -= w
@@ -94,17 +169,22 @@ class Square: SKSpriteNode {
             }
             let newPos = CGPoint(x: x, y: y)
             if self.position !~ newPos {
+                self.position = newPos
                 self.removeAllActions()
-                let a1 = SKAction.move(to: newPos, duration: 0)
-                let a2 = self.mMoveAction(by: direction)
-                self.run(SKAction.sequence([a1, a2]))
+                self.startMoving()
             }
+            //
+            //
+            //                let a1 = SKAction.move(to: newPos, duration: 0)
+            //                let a2 = self.mMoveAction(by: direction)
+            //                self.run(SKAction.sequence([a1, a2]))
+            //            }
         }
     }
     
-    func set(direction: Direction) {
-        self.direction = direction
-    }
+    //    func set(direction: Direction) {
+    //        self.direction = direction
+    //    }
     
     
     
@@ -120,5 +200,51 @@ class Square: SKSpriteNode {
     func createPhysicsBody() {
         
     }
+    
+}
+
+
+
+
+class HeadSquare: Square {
+    
+    var currentDirection: Direction = .up
+    
+    override func createPhysicsBody() {
+        self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
+        self.physicsBody?.isDynamic = false
+        self.physicsBody?.categoryBitMask = BitMasks.head
+        self.physicsBody?.collisionBitMask = BitMasks.apple | BitMasks.body | BitMasks.wall
+        self.physicsBody?.contactTestBitMask = BitMasks.apple | BitMasks.body | BitMasks.wall
+    }
+    
+    
+}
+
+class NeckSquare: Square {
+    
+    override func createPhysicsBody() {
+        self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
+        self.physicsBody?.isDynamic = false
+        self.physicsBody?.categoryBitMask = BitMasks.neck
+    }
+}
+
+
+class BodySquare: Square {
+    
+    override func createPhysicsBody() {
+        self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
+        self.physicsBody?.isDynamic = false
+        self.physicsBody?.categoryBitMask = BitMasks.body
+    }
+    
+    override func myPrint() {
+        for p in pointsToMove {
+            print(p, terminator: ", ")
+        }
+        print()
+    }
+    
     
 }

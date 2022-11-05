@@ -36,7 +36,9 @@ extension CGFloat {
     }
 }
 
-extension CGPoint {
+extension CGPoint: CustomStringConvertible {
+    
+    
     static func ~(lhr: CGPoint, rhs: CGPoint) -> Bool {
         let mistake = 0.2
         return abs(lhr.x - rhs.x) <= mistake && abs(lhr.y - rhs.y) <= mistake
@@ -44,5 +46,9 @@ extension CGPoint {
     
     static func !~(lhr: CGPoint, rhs: CGPoint) -> Bool {
         return !(lhr ~ rhs)
+    }
+    
+    public var description: String {
+        return "(\(Int(self.x)), \(Int(self.y)))"
     }
 }
